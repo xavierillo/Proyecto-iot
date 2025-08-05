@@ -4,22 +4,35 @@ import ParkingViewModel
 import TrafficLightState
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccionScreen(viewModel: ParkingViewModel = viewModel()) {
+fun AccionScreen(navController: NavController, viewModel: ParkingViewModel = viewModel()) {
     val carCount by viewModel.carCount.collectAsState()
     val doorOpen by viewModel.doorOpen.collectAsState()
     val lightState by viewModel.trafficLightState.collectAsState()
@@ -39,16 +52,32 @@ fun AccionScreen(viewModel: ParkingViewModel = viewModel()) {
         }
     }
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Control de Aparcamiento") },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier.clickable {
+                            navController.navigate("home"){
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Control de Aparcamiento", style = MaterialTheme.typography.headlineMedium)
 
             TrafficLight(lightState)
 
@@ -91,6 +120,8 @@ fun LightCircle(color: Color, isOn: Boolean) {
 @Preview(showBackground = true)
 @Composable
 fun AccionScreenPreview() {
+    var navController = NavController(LocalContext.current)
+
     val fakeViewModel = remember {
         object : ParkingViewModel() {
             init {
@@ -101,5 +132,5 @@ fun AccionScreenPreview() {
             }
         }
     }
-    AccionScreen(viewModel = fakeViewModel)
+    AccionScreen(navController, viewModel = fakeViewModel)
 }

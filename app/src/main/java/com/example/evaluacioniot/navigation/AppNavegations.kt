@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.evaluacioniot.screens.AccionScreen
+import com.example.evaluacioniot.screens.ConfiguracionScreen
 import com.example.evaluacioniot.screens.HomeScreen
 import com.example.evaluacioniot.screens.SplashScreen
 
@@ -19,10 +20,10 @@ fun AppNavigation(startDestination: String = AppScreens.Splash.route) {
                         HomeScreen(navController)
                 }
                 composable(route = AppScreens.AccionScreen.route) {
-                        AccionScreen()
+                        AccionScreen(navController)
                 }
                 composable(route = AppScreens.ConfiguracionScreen.route) {
-                        ConfiguracionScreen()
+                        ConfiguracionScreen(navController)
                 }
         }
 }

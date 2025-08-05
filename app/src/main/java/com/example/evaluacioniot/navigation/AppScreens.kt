@@ -8,7 +8,5 @@ sealed class AppScreens(val route: String) {
     object AccionScreen : AppScreens("accion_screen")
 
     object ConfiguracionScreen : AppScreens("configuracion_screen")
-    object FirstScreen: AppScreens("first_screen")
-    object SecondScreen: AppScreens("second_screen")
 
 }

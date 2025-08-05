@@ -1,22 +1,36 @@
-package com.example.evaluacioniot.navigation
+package com.example.evaluacioniot.screens
 
 import ParkingViewModel
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.evaluacioniot.data.SemaforoConfigFirebase
-import com.example.evaluacioniot.screens.ArduinoManager
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConfiguracionScreen(viewModel: ParkingViewModel = viewModel()) {
+fun ConfiguracionScreen(navController: NavController, viewModel: ParkingViewModel = viewModel()) {
     val carCount by viewModel.carCount.collectAsState()
     val maxCapacity by viewModel.maxCapacity.collectAsState()
     val sensorAutoMode by viewModel.sensorAutoMode.collectAsState()
@@ -30,18 +44,36 @@ fun ConfiguracionScreen(viewModel: ParkingViewModel = viewModel()) {
         newCapacity = viewModel.maxCapacity.value.toString()
     }
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Configuración") },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier.clickable {
+                            navController.navigate("home"){
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.Top),
+                .padding(15.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
         ) {
-            Text("Configuración", style = MaterialTheme.typography.headlineMedium)
-
-            Text("Configurar tiempos del semáforo", style = MaterialTheme.typography.headlineSmall)
+            Text("Tiempos del semáforo",
+                style = MaterialTheme.typography.headlineSmall,
+                fontSize = 15.sp
+            )
 
             TiempoInput("Rojo (ms)", firebaseConfig.tiempoRojo) { nuevo ->
                 viewModel.semaforoConfig.value = firebaseConfig.copy(tiempoRojo = nuevo)
@@ -128,6 +160,8 @@ fun TiempoInput(label: String, valor: Int, onValorCambiado: (Int) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun ConfigurationScreenPreview() {
+    var navController = NavController(LocalContext.current)
+
     val fakeViewModel = remember {
         object : ParkingViewModel() {
             init {
@@ -139,7 +173,7 @@ fun ConfigurationScreenPreview() {
         }
     }
 
-    ConfiguracionScreen(viewModel = fakeViewModel)
+    ConfiguracionScreen(navController, viewModel = fakeViewModel)
 }
 
 fun enviarComandosSemaforo(config: SemaforoConfigFirebase) {
